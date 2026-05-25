@@ -1831,12 +1831,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(186));
 const github = __importStar(__webpack_require__(438));
-const semver = __importStar(__webpack_require__(383));
+const version_1 = __webpack_require__(217);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const tag = core.getInput('version');
-            if (semver.valid(tag) == null) {
+            if (version_1.parseVersion(tag) == null) {
                 core.setFailed(`Tag ${tag} does not appear to be a valid semantic version`);
                 return;
             }
@@ -2348,6 +2348,49 @@ module.exports = lt
 /***/ (function(module) {
 
 module.exports = require("https");
+
+/***/ }),
+
+/***/ 217:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseVersion = void 0;
+const semver = __importStar(__webpack_require__(383));
+// parseVersion returns the input tag if its semver portion is valid. The
+// semver portion is everything after the last slash, or the whole tag if
+// there is no slash. The action passes the tag through verbatim, so any
+// path prefix is left to git's ref-format check (server-side) to validate.
+// This supports Go's multi-module repos, which require subdirectory-modules
+// to be tagged like sub/dir/vX.Y.Z (https://go.dev/ref/mod#vcs-version).
+function parseVersion(tag) {
+    const lastSlash = tag.lastIndexOf('/');
+    const version = lastSlash === -1 ? tag : tag.slice(lastSlash + 1);
+    return semver.valid(version) == null ? null : tag;
+}
+exports.parseVersion = parseVersion;
+
 
 /***/ }),
 
